@@ -22,9 +22,11 @@ The goal of this tutorial is to understand the concept of deploying Active Direc
 <h2>Generalized Deployment Summary</h2>
 
 - Setup Domain controller and client within Azure
-- Step 2
-- Step 3
-- Step 4
+- Install and setup Active Directory 
+- Create Admin user and Regular user
+- Connect client-1 to the domain
+- Setup Remote Desktop for non-administrative users
+- Managing issues regarding user accounts  
 
 <h2>Lab Setup</h2>
 
@@ -34,6 +36,8 @@ The goal of this tutorial is to understand the concept of deploying Active Direc
 <p>
   The Domain Controller is the server/computer that has an Active Directory installed on it. To create this in Azure, you will:
   1. Create Virtual Machine
+  
+  
   - Within the page for creating a new VM, create a Resource group and name it (ex Active-Directory-Lab)
 
   
@@ -134,10 +138,12 @@ When the computer needs to look up anything; like google.com; it will look to dc
 <br />
 <h2>Installation and Setup: Active Directory</h2>
 <p>
-<img src="https://i.imgur.com/DJmEXEB.png" height="80%" width="80%" alt="Disk Sanitization Steps"/>
+<img src="https://github.com/user-attachments/assets/b9fd6531-e5bd-49a7-91c3-00c5cf431eb6" height="80%" width="80%" alt="Disk Sanitization Steps"/>
 </p>
 <p>
   To setup up and configure Active Directory:
+ 
+  
   - Go to open dc-1 in the Remote Desktop application and go to Server Manager 
 
   - Click Add Roles and Features (within this there should only be 1 server delection aka dc-1)
@@ -167,7 +173,9 @@ From here you will restart and log back into the dc-1 server, but you must log i
 <h3>Create Domain Admin User</h3>
 <p>
 Now, within Active Directory we are going to create two Organizational Units (OU) called "_ADMINS" and "_EMPLOYEES". When creating theses OU's, we must ensure that they are typed EXACTLY as they are above. To create these:
-- At the start, search Active Directory Users and Computers and open it
+
+  
+  - At the start, search Active Directory Users and Computers and open it
 
 - Right click mydomain.com--> click "new"--> and select Organizational Units
 
@@ -217,31 +225,86 @@ Now Jane is a domain admin and we can log in as her.
 
 <br />
 
-<h2>     </h2>
+<h2>Remote Desktop for Non-Administrative Users</h2>
 <p>
-
-
+  <img src="https://github.com/user-attachments/assets/30bbf204-7176-40b9-999e-fbf15f8663da" height="80%" width="80%" alt="Disk Sanitization Steps"/>
+</p>
+<p>
+  In this section we will create users and attempt to log into client-1 using one of them. To do this as client-1:
 
   
+  - Open system properties 
+
+- Select Remote Desktop and user accounts click "select users that can remotely access this PC"
+
+- Then click "add"--> type "domain users"--> select "check names"--> and click "ok" twice
+
+This makes it so all domain users by default, should be able to access the computer. Although this is typically done under a Group Policy that lets you change multiple systems at once. Either way, you'll now be able to log into client-1 as a normal, non-administrative user. 
+
+<h3>Creating users under Active Directory</h3>
+  Now that we're able to log into client-1 as a normal user, we'll log back into dc-1 as the new admin and create additional users using this <a href="https://github.com/joshmadakor1/AD_PS/blob/master/Generate-Names-Create-Users.ps1">script</a> in Powershell.
+ 
+  
+  - Log into dc-1 as the first employee you created (ex. jane_doe)
+
+  - Open Powershell ISE as an administrator by right clicking it and selecting "runs as administrator"
+
+  - Create a file at the top left and paste the script link above in the file
+
+  - From there you should be able to run the script and see the thousands of users being created
+</p>
+<br />
+<h2>Managing Issues with User Accounts</h2>
+<P>
+  <img src="https://github.com/user-attachments/assets/d5a45eb0-c8d7-4bc5-bbce-9ecb0b3de6ea" height="60%" width="60%" alt="Disk Sanitization Steps"/>
+
+  
+  Within this section we're going to learn how to deal with account lockouts and how to enable and disable accounts. 
+</P>
+
+<h3>Account Lockouts</h3>
+<p>
+  
+  - Log into dc-1 using the Remote Desktop application 
+
+  - Under Active Directory Users and Passwords--> mydomain.com--> and _EMPLOYEES, select a random user to use for testing
+
+  - Attempt to log into client-1 using the selected user (ex. mydomain.com\bala.quco) and ensure that you enter the inncorrect password 10 times to lock the account out
+
+  - Once the account is locked out, go back to Active Directory on dc-1
+
+  - Right click the employee name--> selected properties--> Account--> check off "Unlock account" and the account can be accessed again
+
+<h5>Resetting Passwords</h5>
+
+- Within dc-1, go to Active Directory--> mydomain.com--> _EMPLOYEES
+
+- Right click the account that forgot their password
+
+- Select reset password
+
+- From here you can reset the password and confirm that its changed
+</p>
+<br />
+<h3>Enabling/Disabling Accounts</h3>
+<p>
+
+  
+  - Within dc-1, go to Active Directory--> mydomain.com--> _EMPLOYEES
+
+- Right click the chosen account and click disable
+
+- When attempting to log into the diabled account on client-1, you'll see that the system will not allow it
+
+- From here we're able to re-enable the account the same way it was disabled
+  
+</p>
+<br />
+
+<h4>End Note</h4>
+<p>
+  Be sure to delete all VM and Resources groups in Azure to avoid further charges. 
 </p>
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-<h2>High-Level Deployment and Configuration Steps</h2>
-
-- Step 1
-- Step 2
-- Step 3
-- Step 4
